@@ -277,3 +277,7 @@ func (c *Config) GetExistingSpace() string {
 func (c *Config) GetApiEndpoint() string {
 	return c.ApiEndpoint
 }
+
+func (c *Config) GetUseClientCredentials() bool {
+	return false
+}

@@ -84,7 +84,8 @@ var _ = Describe("UserContext", func() {
 			userContext.CommandStarter = fakeStarter
 		})
 
-		It("logs in the user", func() {
+		It("logs in the user for user-password flow", func() {
+			userContext.UseClientCredentials = false
 			userContext.Login()
 
 			Expect(fakeStarter.CalledWith).To(HaveLen(2))
@@ -108,6 +109,18 @@ var _ = Describe("UserContext", func() {
 
 				Expect(fakeStarter.CalledWith[0].Executable).To(Equal("cf"))
 				Expect(fakeStarter.CalledWith[0].Args).To(Equal([]string{"api", target, "--skip-ssl-validation"}))
+			})
+		})
+
+		Context("when UseClientCredentials is true", func() {
+			It("uses client credentials auth method", func() {
+				userContext.UseClientCredentials = true
+				userContext.Login()
+
+				Expect(fakeStarter.CalledWith).To(HaveLen(2))
+
+				Expect(fakeStarter.CalledWith[1].Executable).To(Equal("cf"))
+				Expect(fakeStarter.CalledWith[1].Args).To(Equal([]string{"auth", testUser.Username(), testUser.Password(), "--client-credentials"}))
 			})
 		})
 

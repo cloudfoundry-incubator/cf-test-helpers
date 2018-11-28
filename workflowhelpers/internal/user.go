@@ -40,6 +40,7 @@ type userConfig interface {
 type AdminUserConfig interface {
 	GetAdminUser() string
 	GetAdminPassword() string
+	GetUseClientCredentials() bool
 }
 
 func NewTestUser(config userConfig, cmdStarter internal.Starter) *TestUser {
