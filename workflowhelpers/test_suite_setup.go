@@ -52,38 +52,41 @@ const RUNAWAY_QUOTA_MEM_LIMIT = "99999G"
 
 func NewTestSuiteSetup(config testSuiteConfig) *ReproducibleTestSuiteSetup {
 	testSpace := internal.NewRegularTestSpace(config, "10G")
-	testUser := internal.NewTestUser(config, commandstarter.NewCommandStarter())
-	adminUser := internal.NewAdminUser(config, commandstarter.NewCommandStarter())
 
-	shortTimeout := config.GetScaledTimeout(1 * time.Minute)
-	regularUserContext := NewUserContext(config.GetApiEndpoint(), testUser, testSpace, config.GetSkipSSLValidation(), shortTimeout)
-	adminUserContext := NewUserContext(config.GetApiEndpoint(), adminUser, nil, config.GetSkipSSLValidation(), shortTimeout)
-	skipUserCreation := config.GetUseExistingUser()
-
-	return NewBaseTestSuiteSetup(config, testSpace, testUser, regularUserContext, adminUserContext, skipUserCreation)
+	return NewTestContextSuiteSetup(config, testSpace, config.GetUseExistingUser())
 }
 
 func NewSmokeTestSuiteSetup(config testSuiteConfig) *ReproducibleTestSuiteSetup {
 	testSpace := internal.NewRegularTestSpace(config, "10G")
-	testUser := internal.NewTestUser(config, commandstarter.NewCommandStarter())
-	adminUser := internal.NewAdminUser(config, commandstarter.NewCommandStarter())
 
-	shortTimeout := config.GetScaledTimeout(1 * time.Minute)
-	regularUserContext := NewUserContext(config.GetApiEndpoint(), testUser, testSpace, config.GetSkipSSLValidation(), shortTimeout)
-	adminUserContext := NewUserContext(config.GetApiEndpoint(), adminUser, nil, config.GetSkipSSLValidation(), shortTimeout)
-
-	return NewBaseTestSuiteSetup(config, testSpace, testUser, regularUserContext, adminUserContext, true)
+	return NewTestContextSuiteSetup(config, testSpace, true)
 }
 
 func NewRunawayAppTestSuiteSetup(config testSuiteConfig) *ReproducibleTestSuiteSetup {
 	testSpace := internal.NewRegularTestSpace(config, RUNAWAY_QUOTA_MEM_LIMIT)
-	testUser := internal.NewTestUser(config, commandstarter.NewCommandStarter())
-	adminUser := internal.NewAdminUser(config, commandstarter.NewCommandStarter())
+
+	return NewTestContextSuiteSetup(config, testSpace, config.GetUseExistingUser())
+}
+
+func NewTestContextSuiteSetup(config testSuiteConfig, testSpace internal.Space, skipUserCreation bool) *ReproducibleTestSuiteSetup {
+	var testUser *internal.TestUser
+	if config.GetExistingClient() != "" && config.GetExistingClientSecret() != "" {
+		testUser = internal.NewTestClient(config, commandstarter.NewCommandStarter())
+		skipUserCreation = true
+	} else {
+		testUser = internal.NewTestUser(config, commandstarter.NewCommandStarter())
+	}
+
+	var adminUser *internal.TestUser
+	if config.GetAdminClient() != "" && config.GetAdminClientSecret() != "" {
+		adminUser = internal.NewAdminClient(config, commandstarter.NewCommandStarter())
+	} else {
+		adminUser = internal.NewAdminUser(config, commandstarter.NewCommandStarter())
+	}
 
 	shortTimeout := config.GetScaledTimeout(1 * time.Minute)
 	regularUserContext := NewUserContext(config.GetApiEndpoint(), testUser, testSpace, config.GetSkipSSLValidation(), shortTimeout)
 	adminUserContext := NewUserContext(config.GetApiEndpoint(), adminUser, nil, config.GetSkipSSLValidation(), shortTimeout)
-	skipUserCreation := config.GetUseExistingUser()
 
 	return NewBaseTestSuiteSetup(config, testSpace, testUser, regularUserContext, adminUserContext, skipUserCreation)
 }

@@ -47,7 +47,7 @@ type ClientConfig interface {
 	GetExistingClientSecret() string
 }
 
-type AdminClientConfig interface{
+type AdminClientConfig interface {
 	GetAdminClient() string
 	GetAdminClientSecret() string
 }

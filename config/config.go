@@ -297,5 +297,5 @@ func (c *Config) GetExistingClient() string {
 }
 
 func (c *Config) GetExistingClientSecret() string {
-	return c.AdminClientSecret
+	return c.ExistingClientSecret
 }
