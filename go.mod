@@ -3,7 +3,7 @@ module github.com/cloudfoundry/cf-test-helpers/v2
 go 1.26.8
 
 require (
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.43.1
 	gopkg.in/yaml.v3 v3.0.1
 )
